@@ -12,12 +12,8 @@ type hdlListener struct {
     *BaseHdlListener
 }
 
-func (listener *hdlListener) EnterChip(context *ChipContext) {
-    fmt.Println("EnterChip")
-}
-
 func (listener *hdlListener) ExitChip(context *ChipContext) {
-    fmt.Println("ExitChip")
+    fmt.Println(context.GetId().GetText())
 }
 
 func main() {
