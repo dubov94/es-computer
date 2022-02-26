@@ -12,8 +12,8 @@ type hdlListener struct {
     *BaseHdlListener
 }
 
-func (listener *hdlListener) ExitChip(context *ChipContext) {
-    fmt.Println(context.GetId().GetText())
+func (listener *hdlListener) ExitChips(context *ChipsContext) {
+    fmt.Println(context.GetText())
 }
 
 func main() {
@@ -26,5 +26,5 @@ func main() {
     stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 	parser := NewHdlParser(stream)
 
-    antlr.ParseTreeWalkerDefault.Walk(&hdlListener{}, parser.Chip())
+    antlr.ParseTreeWalkerDefault.Walk(&hdlListener{}, parser.Chips())
 }

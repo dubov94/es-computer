@@ -9,9 +9,9 @@ antlr(
 )
 
 go_binary(
-    name = "example",
+    name = "compiler",
     srcs = [
-        "example.go",
+        "compiler.go",
         ":hdl",
     ],
     deps = ["@com_github_antlr_antlr4//runtime/Go/antlr:go_default_library"],
