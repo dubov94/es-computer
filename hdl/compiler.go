@@ -8,14 +8,17 @@ import (
     "github.com/antlr/antlr4/runtime/Go/antlr"
 )
 
+type hdlImage struct {}
+
+func (image *hdlImage) String() string {
+    return "HdlImage"
+}
+
 type hdlVisitor struct {
     *BaseHdlVisitor
 }
 
-type hdlImage struct {}
-
 func (visitor *hdlVisitor) VisitChips(context *ChipsContext) interface{} {
-    fmt.Println(context.GetText())
     return &hdlImage{}
 }
 
@@ -30,5 +33,5 @@ func main() {
 	parser := NewHdlParser(stream)
 
     visitor := &hdlVisitor{}
-    parser.Chips().Accept(visitor)
+    fmt.Println(parser.Chips().Accept(visitor))
 }
