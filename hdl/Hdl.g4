@@ -19,13 +19,13 @@ SEMICOLON: ';';
 chips: chip+ EOF;
 chip: CHIP_LABEL ID '{' inputs outputs PARTS_LABEL ':' parts '}';
 
-inputs: IN_LABEL pin_declarations SEMICOLON;
-outputs: OUT_LABEL pin_declarations SEMICOLON;
-pin_declarations: pin_declaration (',' pin_declaration)*;
-pin_declaration: ID ('[' NUMBER ']')?;
+inputs: IN_LABEL pinDeclarations SEMICOLON;
+outputs: OUT_LABEL pinDeclarations SEMICOLON;
+pinDeclarations: pinDeclaration (',' pinDeclaration)*;
+pinDeclaration: ID ('[' NUMBER ']')?;
 
-parts: part_declaration+;
-part_declaration: ID '(' connections ')' SEMICOLON;
+parts: partDeclaration+;
+partDeclaration: ID '(' connections ')' SEMICOLON;
 connections: connection (',' connection)*;
 connection: slice '=' slice;
 slice: ID ('[' NUMBER ('..' NUMBER)? ']')?;

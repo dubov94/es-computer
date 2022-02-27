@@ -8,12 +8,15 @@ import (
     "github.com/antlr/antlr4/runtime/Go/antlr"
 )
 
-type hdlListener struct {
-    *BaseHdlListener
+type hdlVisitor struct {
+    *BaseHdlVisitor
 }
 
-func (listener *hdlListener) ExitChips(context *ChipsContext) {
+type hdlImage struct {}
+
+func (visitor *hdlVisitor) VisitChips(context *ChipsContext) interface{} {
     fmt.Println(context.GetText())
+    return &hdlImage{}
 }
 
 func main() {
@@ -26,5 +29,6 @@ func main() {
     stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 	parser := NewHdlParser(stream)
 
-    antlr.ParseTreeWalkerDefault.Walk(&hdlListener{}, parser.Chips())
+    visitor := &hdlVisitor{}
+    parser.Chips().Accept(visitor)
 }

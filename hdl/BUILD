@@ -6,6 +6,7 @@ antlr(
     srcs = ["Hdl.g4"],
     language = "Go",
     package = "main",
+    visitor = True,
 )
 
 go_binary(
