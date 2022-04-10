@@ -37,7 +37,7 @@ type connection struct {
 }
 
 func (self *connection) String() string {
-	return fmt.Sprintf("%s=%s", self.source.String(), self.target.String())
+	return fmt.Sprintf("%s=%s", self.target.String(), self.source.String())
 }
 
 func (self *connection) Source() *terminals {
@@ -159,8 +159,8 @@ func (visitor *hdlVisitor) VisitSlice(context *SliceContext) interface{} {
 }
 
 func (visitor *hdlVisitor) VisitConnection(context *ConnectionContext) interface{} {
-	source := context.Slice(0).Accept(visitor).(*terminals)
-	target := context.Slice(1).Accept(visitor).(*terminals)
+	target := context.Slice(0).Accept(visitor).(*terminals)
+	source := context.Slice(1).Accept(visitor).(*terminals)
 	return &connection{source: source, target: target}
 }
 
