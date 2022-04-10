@@ -19,6 +19,18 @@ func (self *terminals) String() string {
 	return fmt.Sprintf("%s[%d:%d]", self.name, self.lower, self.upper)
 }
 
+func (self *terminals) Name() string {
+	return self.name
+}
+
+func (self *terminals) Lower() int {
+	return self.lower
+}
+
+func (self *terminals) Upper() int {
+	return self.upper
+}
+
 type connection struct {
 	source *terminals
 	target *terminals
@@ -26,6 +38,14 @@ type connection struct {
 
 func (self *connection) String() string {
 	return fmt.Sprintf("%s=%s", self.source.String(), self.target.String())
+}
+
+func (self *connection) Source() *terminals {
+	return self.source
+}
+
+func (self *connection) Target() *terminals {
+	return self.target
 }
 
 type partImage struct {
@@ -39,6 +59,14 @@ func (self *partImage) String() string {
 		connections = append(connections, connection.String())
 	}
 	return fmt.Sprintf("%s(%s)", self.name, strings.Join(connections, ", "))
+}
+
+func (self *partImage) Name() string {
+	return self.name
+}
+
+func (self *partImage) Connections() []*connection {
+	return self.connections
 }
 
 type chipImage struct {
@@ -68,6 +96,22 @@ func (self *chipImage) String() string {
 	return strings.Join(lines, "\n")
 }
 
+func (self *chipImage) Name() string {
+	return self.name
+}
+
+func (self *chipImage) Inputs() []*terminals {
+	return self.inputs
+}
+
+func (self *chipImage) Outputs() []*terminals {
+	return self.outputs
+}
+
+func (self *chipImage) Parts() []*partImage {
+	return self.parts
+}
+
 type hdlImage struct {
 	chips []*chipImage
 }
@@ -78,6 +122,10 @@ func (self *hdlImage) String() string {
 		chips = append(chips, chip.String())
 	}
 	return strings.Join(chips, "\n")
+}
+
+func (self *hdlImage) Chips() []*chipImage {
+	return self.chips
 }
 
 type hdlVisitor struct {
