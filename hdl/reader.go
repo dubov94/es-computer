@@ -9,42 +9,42 @@ import (
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )
 
-type terminals struct {
+type Terminals struct {
 	name  string
 	lower int
 	upper int
 }
 
-func (self *terminals) String() string {
+func (self *Terminals) String() string {
 	return fmt.Sprintf("%s[%d:%d]", self.name, self.lower, self.upper)
 }
 
-func (self *terminals) Name() string {
+func (self *Terminals) Name() string {
 	return self.name
 }
 
-func (self *terminals) Lower() int {
+func (self *Terminals) Lower() int {
 	return self.lower
 }
 
-func (self *terminals) Upper() int {
+func (self *Terminals) Upper() int {
 	return self.upper
 }
 
 type connection struct {
-	source *terminals
-	target *terminals
+	source *Terminals
+	target *Terminals
 }
 
 func (self *connection) String() string {
 	return fmt.Sprintf("%s=%s", self.target.String(), self.source.String())
 }
 
-func (self *connection) Source() *terminals {
+func (self *connection) Source() *Terminals {
 	return self.source
 }
 
-func (self *connection) Target() *terminals {
+func (self *connection) Target() *Terminals {
 	return self.target
 }
 
@@ -69,14 +69,14 @@ func (self *partImage) Connections() []*connection {
 	return self.connections
 }
 
-type chipImage struct {
+type ChipImage struct {
 	name    string
-	inputs  []*terminals
-	outputs []*terminals
+	inputs  []*Terminals
+	outputs []*Terminals
 	parts   []*partImage
 }
 
-func (self *chipImage) String() string {
+func (self *ChipImage) String() string {
 	var lines []string
 	lines = append(lines, fmt.Sprintf("CHIP %s", self.name))
 	var inputs []string
@@ -96,27 +96,27 @@ func (self *chipImage) String() string {
 	return strings.Join(lines, "\n")
 }
 
-func (self *chipImage) Name() string {
+func (self *ChipImage) Name() string {
 	return self.name
 }
 
-func (self *chipImage) Inputs() []*terminals {
+func (self *ChipImage) Inputs() []*Terminals {
 	return self.inputs
 }
 
-func (self *chipImage) Outputs() []*terminals {
+func (self *ChipImage) Outputs() []*Terminals {
 	return self.outputs
 }
 
-func (self *chipImage) Parts() []*partImage {
+func (self *ChipImage) Parts() []*partImage {
 	return self.parts
 }
 
-type hdlImage struct {
-	chips []*chipImage
+type HdlImage struct {
+	chips []*ChipImage
 }
 
-func (self *hdlImage) String() string {
+func (self *HdlImage) String() string {
 	var chips []string
 	for _, chip := range self.chips {
 		chips = append(chips, chip.String())
@@ -124,7 +124,7 @@ func (self *hdlImage) String() string {
 	return strings.Join(chips, "\n")
 }
 
-func (self *hdlImage) Chips() []*chipImage {
+func (self *HdlImage) Chips() []*ChipImage {
 	return self.chips
 }
 
@@ -138,14 +138,14 @@ func (visitor *hdlVisitor) VisitSlice(context *SliceContext) interface{} {
 	fst := context.NUMBER(0)
 	snd := context.NUMBER(1)
 	if snd == nil && fst == nil {
-		return &terminals{name: name, lower: 0, upper: 0}
+		return &Terminals{name: name, lower: 0, upper: 0}
 	}
 	if snd == nil {
 		index, err := strconv.Atoi(fst.GetText())
 		if err != nil {
 			visitor.reporter.HdlVisitorError(err, fst.GetSymbol())
 		}
-		return &terminals{name: name, lower: index, upper: index + 1}
+		return &Terminals{name: name, lower: index, upper: index + 1}
 	}
 	upper, err := strconv.Atoi(snd.GetText())
 	if err != nil {
@@ -155,12 +155,12 @@ func (visitor *hdlVisitor) VisitSlice(context *SliceContext) interface{} {
 	if err != nil {
 		visitor.reporter.HdlVisitorError(err, fst.GetSymbol())
 	}
-	return &terminals{name: name, lower: lower, upper: upper + 1}
+	return &Terminals{name: name, lower: lower, upper: upper + 1}
 }
 
 func (visitor *hdlVisitor) VisitConnection(context *ConnectionContext) interface{} {
-	target := context.Slice(0).Accept(visitor).(*terminals)
-	source := context.Slice(1).Accept(visitor).(*terminals)
+	target := context.Slice(0).Accept(visitor).(*Terminals)
+	source := context.Slice(1).Accept(visitor).(*Terminals)
 	return &connection{source: source, target: target}
 }
 
@@ -192,19 +192,19 @@ func (visitor *hdlVisitor) VisitPinDeclaration(context *PinDeclarationContext) i
 	name := context.ID().GetText()
 	number := context.NUMBER()
 	if number == nil {
-		return &terminals{name: name, lower: 0, upper: 0}
+		return &Terminals{name: name, lower: 0, upper: 0}
 	}
 	upper, err := strconv.Atoi(number.GetText())
 	if err != nil {
 		visitor.reporter.HdlVisitorError(err, number.GetSymbol())
 	}
-	return &terminals{name: name, lower: 0, upper: upper}
+	return &Terminals{name: name, lower: 0, upper: upper}
 }
 
 func (visitor *hdlVisitor) VisitPinDeclarations(context *PinDeclarationsContext) interface{} {
-	var items []*terminals
+	var items []*Terminals
 	for _, declarationContext := range context.AllPinDeclaration() {
-		item := declarationContext.Accept(visitor).(*terminals)
+		item := declarationContext.Accept(visitor).(*Terminals)
 		items = append(items, item)
 	}
 	return items
@@ -220,18 +220,18 @@ func (visitor *hdlVisitor) VisitOutputs(context *OutputsContext) interface{} {
 
 func (visitor *hdlVisitor) VisitChip(context *ChipContext) interface{} {
 	name := context.ID().GetText()
-	inputs := context.Inputs().Accept(visitor).([]*terminals)
-	outputs := context.Outputs().Accept(visitor).([]*terminals)
+	inputs := context.Inputs().Accept(visitor).([]*Terminals)
+	outputs := context.Outputs().Accept(visitor).([]*Terminals)
 	parts := context.Parts().Accept(visitor).([]*partImage)
-	return &chipImage{name: name, inputs: inputs, outputs: outputs, parts: parts}
+	return &ChipImage{name: name, inputs: inputs, outputs: outputs, parts: parts}
 }
 
 func (visitor *hdlVisitor) VisitChips(context *ChipsContext) interface{} {
-	var chips []*chipImage
+	var chips []*ChipImage
 	for _, chipContext := range context.AllChip() {
-		chips = append(chips, chipContext.Accept(visitor).(*chipImage))
+		chips = append(chips, chipContext.Accept(visitor).(*ChipImage))
 	}
-	return &hdlImage{chips: chips}
+	return &HdlImage{chips: chips}
 }
 
 type errorListener struct {
@@ -246,7 +246,7 @@ func (listener *errorListener) HdlVisitorError(exc error, token antlr.Token) {
 	log.Fatalf("[%d:%d] %s", token.GetLine(), token.GetColumn(), exc.Error())
 }
 
-func ReadHdl(path string) *hdlImage {
+func ReadHdl(path string) *HdlImage {
 	input, err := antlr.NewFileStream(path)
 	if err != nil {
 		log.Fatal(err)
@@ -263,5 +263,5 @@ func ReadHdl(path string) *hdlImage {
 	parser.AddErrorListener(reporter)
 
 	visitor := &hdlVisitor{reporter: reporter}
-	return parser.Chips().Accept(visitor).(*hdlImage)
+	return parser.Chips().Accept(visitor).(*HdlImage)
 }

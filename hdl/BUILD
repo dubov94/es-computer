@@ -19,8 +19,18 @@ go_library(
     deps = ["@com_github_antlr_antlr4//runtime/Go/antlr:go_default_library"],
 )
 
+go_library(
+    name = "indexer",
+    srcs = ["indexer.go"],
+    importpath = "github.com/dubov94/es-computer/hdl/indexer",
+    deps = [":reader"],
+)
+
 go_binary(
     name = "compiler",
     srcs = ["compiler.go"],
-    deps = [":reader"],
+    deps = [
+        ":indexer",
+        ":reader",
+    ],
 )
